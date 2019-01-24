@@ -155,6 +155,30 @@ class permission
         return $permissinList;
     }
 
+    public function getPermissionList()
+    {
+        $pdo = $this->connect->prepare('SELECT p.permissionId, r.name, r.description, p.userId, p.createDate from permission p
+          LEFT JOIN roles r ON r.rolesId = p.rolesId
+          WHERE p.isActive=:isActive and p.isDelete=:isDelete');
+        $pdo->bindValue(':isActive', $this->getisActive(), PDO::PARAM_BOOL);
+        $pdo->bindValue(':isDelete', $this->getisDelete(), PDO::PARAM_BOOL);
+
+        try {
+            $pdo->execute();
+            //datayı işleyeceğimiz bir dizi yaratalım.
+            $rows = array();
+            while($r = $pdo->fetchObject()){
+              //objemizi datamıza işleyelim.
+                $rows[] = $r;
+            }
+            return $rows;
+
+        } catch (PDOException $errorInfo) {
+            return $errorInfo->getMessage();
+        }
+
+    }
+
     public function addPermission()
     {
 
